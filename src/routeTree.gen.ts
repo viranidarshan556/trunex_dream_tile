@@ -9,38 +9,162 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SelfDesignRouteImport } from './routes/self-design'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ExpertDesignRouteImport } from './routes/expert-design'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ResultIdRouteImport } from './routes/result.$id'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated.admin.index'
+import { Route as AuthenticatedAdminTilesRouteImport } from './routes/_authenticated.admin.tiles'
+import { Route as AuthenticatedAdminLeadsRouteImport } from './routes/_authenticated.admin.leads'
 
+const SelfDesignRoute = SelfDesignRouteImport.update({
+  id: '/self-design',
+  path: '/self-design',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExpertDesignRoute = ExpertDesignRouteImport.update({
+  id: '/expert-design',
+  path: '/expert-design',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResultIdRoute = ResultIdRouteImport.update({
+  id: '/result/$id',
+  path: '/result/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/_authenticated/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminTilesRoute = AuthenticatedAdminTilesRouteImport.update({
+  id: '/tiles',
+  path: '/tiles',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminLeadsRoute = AuthenticatedAdminLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/expert-design': typeof ExpertDesignRoute
+  '/login': typeof LoginRoute
+  '/self-design': typeof SelfDesignRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/result/$id': typeof ResultIdRoute
+  '/admin/leads': typeof AuthenticatedAdminLeadsRoute
+  '/admin/tiles': typeof AuthenticatedAdminTilesRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/expert-design': typeof ExpertDesignRoute
+  '/login': typeof LoginRoute
+  '/self-design': typeof SelfDesignRoute
+  '/result/$id': typeof ResultIdRoute
+  '/admin/leads': typeof AuthenticatedAdminLeadsRoute
+  '/admin/tiles': typeof AuthenticatedAdminTilesRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/expert-design': typeof ExpertDesignRoute
+  '/login': typeof LoginRoute
+  '/self-design': typeof SelfDesignRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
+  '/result/$id': typeof ResultIdRoute
+  '/_authenticated/admin/leads': typeof AuthenticatedAdminLeadsRoute
+  '/_authenticated/admin/tiles': typeof AuthenticatedAdminTilesRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/expert-design'
+    | '/login'
+    | '/self-design'
+    | '/admin'
+    | '/result/$id'
+    | '/admin/leads'
+    | '/admin/tiles'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/expert-design'
+    | '/login'
+    | '/self-design'
+    | '/result/$id'
+    | '/admin/leads'
+    | '/admin/tiles'
+    | '/admin'
+  id:
+    | '__root__'
+    | '/'
+    | '/expert-design'
+    | '/login'
+    | '/self-design'
+    | '/_authenticated/admin'
+    | '/result/$id'
+    | '/_authenticated/admin/leads'
+    | '/_authenticated/admin/tiles'
+    | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ExpertDesignRoute: typeof ExpertDesignRoute
+  LoginRoute: typeof LoginRoute
+  SelfDesignRoute: typeof SelfDesignRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
+  ResultIdRoute: typeof ResultIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/self-design': {
+      id: '/self-design'
+      path: '/self-design'
+      fullPath: '/self-design'
+      preLoaderRoute: typeof SelfDesignRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/expert-design': {
+      id: '/expert-design'
+      path: '/expert-design'
+      fullPath: '/expert-design'
+      preLoaderRoute: typeof ExpertDesignRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +172,66 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/result/$id': {
+      id: '/result/$id'
+      path: '/result/$id'
+      fullPath: '/result/$id'
+      preLoaderRoute: typeof ResultIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/tiles': {
+      id: '/_authenticated/admin/tiles'
+      path: '/tiles'
+      fullPath: '/admin/tiles'
+      preLoaderRoute: typeof AuthenticatedAdminTilesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/leads': {
+      id: '/_authenticated/admin/leads'
+      path: '/leads'
+      fullPath: '/admin/leads'
+      preLoaderRoute: typeof AuthenticatedAdminLeadsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminLeadsRoute: typeof AuthenticatedAdminLeadsRoute
+  AuthenticatedAdminTilesRoute: typeof AuthenticatedAdminTilesRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminLeadsRoute: AuthenticatedAdminLeadsRoute,
+  AuthenticatedAdminTilesRoute: AuthenticatedAdminTilesRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ExpertDesignRoute: ExpertDesignRoute,
+  LoginRoute: LoginRoute,
+  SelfDesignRoute: SelfDesignRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
+  ResultIdRoute: ResultIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
