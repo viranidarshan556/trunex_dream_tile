@@ -19,8 +19,8 @@ interface Props {
   onSelect: (tile: Tile) => void;
 }
 
-const FINISHES = ["all", "matte", "glossy", "rustic", "polished", "satin"];
-const ROOMS = ["all", "bedroom", "living", "kitchen", "bathroom", "outdoor", "office", "commercial"];
+const FINISHES = ["all", "matte", "glossy", "anti_skid"];
+const ROOMS = ["all", "bathroom", "living_room", "kitchen", "balcony", "bedroom"];
 
 export function TileGallery({ selectedId, onSelect }: Props) {
   const [tiles, setTiles] = useState<Tile[]>([]);
