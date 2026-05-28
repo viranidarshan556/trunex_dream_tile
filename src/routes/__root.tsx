@@ -73,14 +73,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "TRUNEX — AI Tile Visualizer" },
+      { name: "description", content: "See TRUNEX tiles rendered in your own room with AI." },
+      { name: "author", content: "TRUNEX" },
+      { property: "og:title", content: "TRUNEX — AI Tile Visualizer" },
+      { property: "og:description", content: "See TRUNEX tiles rendered in your own room with AI." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       {
