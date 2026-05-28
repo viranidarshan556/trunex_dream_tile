@@ -74,7 +74,7 @@ function AdminLayout() {
             return (
               <Link
                 key={t.to}
-                to={t.to}
+                to={t.to as any}
                 className={cn(
                   "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs",
                   active ? "border-gold bg-gold/15 text-gold" : "border-border/60 text-muted-foreground hover:text-foreground",
