@@ -53,11 +53,11 @@ function AdminLayout() {
     );
   }
 
-  const tabs = [
+  const tabs: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
     { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
     { to: "/admin/leads", label: "Leads", icon: Users },
     { to: "/admin/tiles", label: "Tiles", icon: LayoutGrid },
-  ] as const;
+  ];
 
   return (
     <div className="min-h-screen">
