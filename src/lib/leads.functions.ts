@@ -37,11 +37,20 @@ export const createLead = createServerFn({ method: "POST" })
     return row;
   });
 
-const previewSchema = z.object({
-  lead_id: z.string().uuid(),
-  room_image_url: z.string().url(),
-  tile_id: z.string().uuid(),
-});
+const previewSchema = z
+  .object({
+    lead_id: z.string().uuid(),
+    room_image_url: z.string().url(),
+    tile_id: z.string().uuid().optional(),
+    // Inline tile (used for built-in/default tiles that are not in the DB).
+    tile_image_url: z.string().url().optional(),
+    tile_name: z.string().optional(),
+    tile_size: z.string().optional(),
+    tile_finish: z.string().optional(),
+  })
+  .refine((d) => !!d.tile_id || !!d.tile_image_url, {
+    message: "Either tile_id or tile_image_url is required",
+  });
 
 async function fetchImageAsDataUrl(url: string): Promise<string> {
   const res = await fetch(url);
@@ -56,22 +65,51 @@ export const generatePreview = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => previewSchema.parse(d))
   .handler(async ({ data }) => {
     const sb = admin();
-    const { data: tile, error: tErr } = await sb
-      .from("tiles")
-      .select("id, name, code, image_url, finish, size")
-      .eq("id", data.tile_id)
-      .single();
-    if (tErr || !tile) throw new Error("Tile not found");
+
+    let tileImageUrl: string;
+    let tileName = data.tile_name || "selected tile";
+    let tileSize = data.tile_size || "600x600";
+    let tileFinish = data.tile_finish || "matte";
+    let dbTile: any = null;
+
+    if (data.tile_id) {
+      const { data: tile, error: tErr } = await sb
+        .from("tiles")
+        .select("id, name, code, image_url, finish, size")
+        .eq("id", data.tile_id)
+        .single();
+      if (tErr || !tile) throw new Error("Tile not found");
+      dbTile = tile;
+      tileImageUrl = tile.image_url;
+      tileName = tile.name;
+      tileSize = tile.size;
+      tileFinish = tile.finish;
+    } else {
+      tileImageUrl = data.tile_image_url!;
+    }
 
     const [roomDataUrl, tileDataUrl] = await Promise.all([
       fetchImageAsDataUrl(data.room_image_url),
-      fetchImageAsDataUrl(tile.image_url),
+      fetchImageAsDataUrl(tileImageUrl),
     ]);
 
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
 
-    const prompt = `You are an expert interior visualizer. Take the first image (a real room photo) and replace ONLY the floor surface with the tile pattern shown in the second image. Preserve the original room's perspective, lighting, shadows, furniture, walls, and camera angle exactly. The tile should tile naturally with realistic grout lines, correct scale (tile size ${tile.size}), and ${tile.finish} finish reflectivity. Output a single photorealistic image of the same room with the new floor.`;
+    const prompt = `You are an expert interior visualizer. The FIRST image is a real photo of a customer's room. The SECOND image is a single tile texture (${tileName}, size ${tileSize}, ${tileFinish} finish).
+
+YOUR TASK: Re-render the same room with this tile applied to the appropriate surface(s). Auto-detect the surface based on the photo:
+- If the photo is a normal room / living room / bedroom / kitchen / office — tile the FLOOR only.
+- If the photo is a bathroom or shower area — tile BOTH the floor AND the wet-area walls (where wall tiles typically go).
+- If the photo clearly shows only a wall (close-up of wall, backsplash, feature wall) — tile that WALL.
+- If both floor and walls are clearly visible in a bathroom-like setting — tile both.
+
+CRITICAL RULES:
+1. Preserve the room's perspective, camera angle, lighting direction, shadows, furniture, fixtures, doors, windows, ceiling and any objects exactly as in the original photo. Do not move or alter them.
+2. Tile the chosen surface(s) with realistic grout lines, correct scale for tile size ${tileSize}, and surface reflectivity matching a ${tileFinish} finish.
+3. Follow the original surface's perspective so tiles converge naturally toward vanishing points.
+4. Preserve the original shadows cast onto the surface by furniture and people.
+5. Output a single photorealistic image of the same room with the new tile applied. Do NOT add or remove furniture. Do NOT change wall color outside the tiled area.`;
 
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -109,7 +147,6 @@ export const generatePreview = createServerFn({ method: "POST" })
         : undefined);
     if (!imgUrl) throw new Error("No image returned from AI");
 
-    // Decode and upload to storage
     const m = imgUrl.match(/^data:(.+?);base64,(.+)$/);
     let buffer: Buffer;
     let contentType = "image/png";
@@ -129,12 +166,11 @@ export const generatePreview = createServerFn({ method: "POST" })
     if (upErr) throw new Error(upErr.message);
     const publicUrl = sb.storage.from("generated-previews").getPublicUrl(path).data.publicUrl;
 
-    await sb
-      .from("leads")
-      .update({ generated_image_url: publicUrl, tile_id: tile.id })
-      .eq("id", data.lead_id);
+    const update: any = { generated_image_url: publicUrl };
+    if (dbTile) update.tile_id = dbTile.id;
+    await sb.from("leads").update(update).eq("id", data.lead_id);
 
-    return { generated_image_url: publicUrl, tile };
+    return { generated_image_url: publicUrl, tile: dbTile };
   });
 
 export const getLeadResult = createServerFn({ method: "GET" })
