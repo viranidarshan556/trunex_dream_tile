@@ -1,5 +1,5 @@
 // TRUNEX WhatsApp number (with country code, digits only).
-export const TRUNEX_WHATSAPP = "918798921619";
+export const TRUNEX_WHATSAPP = "918798821619";
 export const BRAND = {
   name: "TRUNEX",
   tagline: "AI Tile Visualizer",

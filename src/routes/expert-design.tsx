@@ -57,7 +57,8 @@ function ExpertPage() {
         imageUrl: roomUrl,
       });
       toast.success("Opening WhatsApp…");
-      window.location.href = url;
+      const w = window.open(url, "_blank");
+      if (!w) window.location.href = url;
     } catch (err: any) {
       console.error(err);
       toast.error(err?.message || "Could not submit. Try again.");

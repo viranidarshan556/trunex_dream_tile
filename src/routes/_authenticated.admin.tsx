@@ -1,16 +1,12 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, Outlet, redirect, useNavigate, Link, useLocation } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useNavigate, Link, useLocation } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { BRAND } from "@/lib/constants";
-import { LayoutDashboard, Users, LayoutGrid, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, LayoutGrid, LogOut, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin")({
-  beforeLoad: async () => {
-    const { data, error } = await supabase.auth.getUser();
-    if (error || !data.user) throw redirect({ to: "/login" });
-  },
   component: AdminLayout,
 });
 
@@ -23,22 +19,32 @@ function AdminLayout() {
   useEffect(() => {
     (async () => {
       const { data } = await supabase.auth.getUser();
-      setEmail(data.user?.email ?? null);
-      if (data.user) {
-        const { data: roles } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", data.user.id)
-          .eq("role", "admin")
-          .maybeSingle();
-        setIsAdmin(!!roles);
+      if (!data.user) {
+        navigate({ to: "/login" });
+        return;
       }
+      setEmail(data.user.email ?? null);
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", data.user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      setIsAdmin(!!roles);
     })();
-  }, []);
+  }, [navigate]);
 
   async function signOut() {
     await supabase.auth.signOut();
     navigate({ to: "/login" });
+  }
+
+  if (isAdmin === null) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-gold" />
+      </div>
+    );
   }
 
   if (isAdmin === false) {
