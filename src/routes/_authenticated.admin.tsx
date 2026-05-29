@@ -3,7 +3,7 @@ import { createFileRoute, Outlet, useNavigate, Link, useLocation } from "@tansta
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { BRAND } from "@/lib/constants";
-import { LayoutDashboard, Users, LayoutGrid, LogOut, Loader2 } from "lucide-react";
+import { LayoutDashboard, Users, LayoutGrid, LogOut, Loader2, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -63,6 +63,7 @@ function AdminLayout() {
     { to: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
     { to: "/admin/leads", label: "Leads", icon: Users },
     { to: "/admin/tiles", label: "Tiles", icon: LayoutGrid },
+    { to: "/admin/contacts", label: "Contacts", icon: Mail },
   ];
 
   return (
