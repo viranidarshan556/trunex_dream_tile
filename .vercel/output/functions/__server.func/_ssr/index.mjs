@@ -9,6 +9,9 @@ if (typeof globalThis.addEventListener === "function") {
     "unhandledrejection",
     (event) => record(event.reason)
   );
+} else if (typeof process !== "undefined" && typeof process.on === "function") {
+  process.on("uncaughtException", (error) => record(error));
+  process.on("unhandledRejection", (reason) => record(reason));
 }
 function consumeLastCapturedError() {
   if (!lastCapturedError) return void 0;
