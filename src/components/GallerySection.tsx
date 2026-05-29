@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
+import { DEFAULT_TILES } from "@/lib/default-tiles";
 
 interface Tile {
   id: string;
@@ -12,7 +13,7 @@ interface Tile {
 }
 
 export function GallerySection() {
-  const [tiles, setTiles] = useState<Tile[]>([]);
+  const [tiles, setTiles] = useState<Tile[]>(DEFAULT_TILES);
 
   useEffect(() => {
     supabase
@@ -21,7 +22,10 @@ export function GallerySection() {
       .eq("active", true)
       .order("created_at", { ascending: false })
       .limit(12)
-      .then(({ data }) => setTiles((data as Tile[]) || []));
+      .then(({ data }) => {
+        const dbTiles = (data as Tile[]) || [];
+        setTiles([...dbTiles, ...DEFAULT_TILES].slice(0, 12));
+      });
   }, []);
 
   return (

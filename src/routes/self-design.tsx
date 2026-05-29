@@ -50,20 +50,39 @@ function SelfDesignPage() {
       setBusyMsg("Uploading your room…");
       const roomUrl = await uploadRoomImage(file);
 
+      const isDefault = tile.id.startsWith("default-");
+      const tileAbsoluteUrl = isDefault
+        ? `${window.location.origin}${tile.image_url}`
+        : tile.image_url;
+
       setBusyMsg("Saving your details…");
       const lead = await createLeadFn({
         data: {
           ...parsed.data,
           flow_type: "self",
-          tile_id: tile.id,
+          tile_id: isDefault ? null : tile.id,
           original_image_url: roomUrl,
         },
       });
 
       setBusyMsg("AI is rendering your tile preview…");
       await generatePreviewFn({
-        data: { lead_id: lead.id, room_image_url: roomUrl, tile_id: tile.id },
+        data: isDefault
+          ? {
+              lead_id: lead.id,
+              room_image_url: roomUrl,
+              tile_image_url: tileAbsoluteUrl,
+              tile_name: tile.name,
+              tile_size: tile.size,
+              tile_finish: tile.finish,
+            }
+          : {
+              lead_id: lead.id,
+              room_image_url: roomUrl,
+              tile_id: tile.id,
+            },
       });
+
 
       toast.success("Your preview is ready!");
       navigate({ to: "/result/$id", params: { id: lead.id } });
