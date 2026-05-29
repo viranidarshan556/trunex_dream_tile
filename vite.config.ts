@@ -11,6 +11,11 @@ export default defineConfig({
     // Lovable's wrapper skips Nitro outside its sandbox unless we opt in.
     // Force the Vercel preset so production builds emit the server bundle Vercel expects.
     preset: "vercel",
+    output: {
+      dir: ".vercel/output",
+      serverDir: ".vercel/output/functions/__server.func",
+      publicDir: ".vercel/output/static",
+    },
   },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
