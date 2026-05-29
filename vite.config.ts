@@ -7,6 +7,26 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
+  plugins: [
+    {
+      name: "production-ssr-error-logger",
+      transform(code, id) {
+        const normalizedId = id.replace(/\\/g, "/");
+        const isTargetModule =
+          normalizedId.includes("/@tanstack/start-server-core/src/request-response.ts") ||
+          normalizedId.includes("/@tanstack/start-server-core/dist/esm/request-response.js");
+        if (!isTargetModule) return null;
+
+        const needle = "handler(request, requestOpts)";
+        if (!code.includes(needle)) return null;
+
+        return code.replace(
+          needle,
+          `Promise.resolve(${needle}).catch((err) => { globalThis.__LOVABLE_TANSTACK_CAPTURE_SSR_ERROR__?.(err); throw err; })`,
+        );
+      },
+    },
+  ],
   nitro: {
     // Lovable's wrapper skips Nitro outside its sandbox unless we opt in.
     // Force the Vercel preset so production builds emit the server bundle Vercel expects.

@@ -3,6 +3,7 @@ const TTL_MS = 5e3;
 function record(error) {
   lastCapturedError = { error, at: Date.now() };
 }
+globalThis.__LOVABLE_TANSTACK_CAPTURE_SSR_ERROR__ = record;
 if (typeof globalThis.addEventListener === "function") {
   globalThis.addEventListener("error", (event) => record(event.error ?? event));
   globalThis.addEventListener(
@@ -69,7 +70,7 @@ ${errorStack}</pre>
 let serverEntryPromise;
 async function getServerEntry() {
   if (!serverEntryPromise) {
-    serverEntryPromise = import("./server-BV-6dHeb.mjs").then((n) => n.s).then(
+    serverEntryPromise = import("./server-Czlvuct_.mjs").then((n) => n.s).then(
       (m) => m.default ?? m
     );
   }

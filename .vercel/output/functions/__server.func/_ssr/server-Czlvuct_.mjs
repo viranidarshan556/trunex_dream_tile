@@ -68,7 +68,10 @@ function requestHandler(handler) {
       });
       throw error;
     }
-    return toResponse(attachResponseHeaders(eventStorage.run({ h3Event }, () => handler(request, requestOpts)), h3Event), h3Event);
+    return toResponse(attachResponseHeaders(eventStorage.run({ h3Event }, () => Promise.resolve(handler(request, requestOpts)).catch((err) => {
+      globalThis.__LOVABLE_TANSTACK_CAPTURE_SSR_ERROR__?.(err);
+      throw err;
+    })), h3Event), h3Event);
   };
 }
 function getH3Event() {
@@ -106,55 +109,55 @@ async function getStartManifest(matchedRoutes) {
 const manifest = {
   "08c965869a2f91e208cdeb8ba1fb475ab63ebb3216a549387f4273fe177ecfe3": {
     functionName: "updateLead_createServerFn_handler",
-    importer: () => import("./admin.functions-BfVLr8RV.mjs")
+    importer: () => import("./admin.functions-Q8Ozl9gU.mjs")
   },
   "1ac20e83585a55e943670fa4670b07889b610801a7a21f28dc367c19f92e50fd": {
     functionName: "submitContact_createServerFn_handler",
-    importer: () => import("./contact.functions-DiiqUXA9.mjs")
+    importer: () => import("./contact.functions-B4YTt0TD.mjs")
   },
   "31268a6b3a687234f7b6a0977b07f20f082afec1528a26cc9ece4c7c1d53487f": {
     functionName: "getStats_createServerFn_handler",
-    importer: () => import("./admin.functions-BfVLr8RV.mjs")
+    importer: () => import("./admin.functions-Q8Ozl9gU.mjs")
   },
   "344935986c686663187b2dcb19231e3c6c45f7f8d08757c3002271f4ffd76c0a": {
     functionName: "listContacts_createServerFn_handler",
-    importer: () => import("./contact.functions-DiiqUXA9.mjs")
+    importer: () => import("./contact.functions-B4YTt0TD.mjs")
   },
   "3a7c0734422901ccc86741fa396c2c561649c5b6188e4ccd9355ec9dbdcc61fd": {
     functionName: "deleteContact_createServerFn_handler",
-    importer: () => import("./contact.functions-DiiqUXA9.mjs")
+    importer: () => import("./contact.functions-B4YTt0TD.mjs")
   },
   "831ab7258e4b42992e0dbdb9f7fe4a910abe409e17ea40e8edb272115b38a519": {
     functionName: "deleteTile_createServerFn_handler",
-    importer: () => import("./admin.functions-BfVLr8RV.mjs")
+    importer: () => import("./admin.functions-Q8Ozl9gU.mjs")
   },
   "a13c3b0d62eea35ba805b089a3831e1be937ec740199e09b4efc93c0ef8a2fbc": {
     functionName: "listLeads_createServerFn_handler",
-    importer: () => import("./admin.functions-BfVLr8RV.mjs")
+    importer: () => import("./admin.functions-Q8Ozl9gU.mjs")
   },
   "a714aea962572ad8f71408bbe0ddc3e51d6fdaac1ee82ad1331742c222b8ce6e": {
     functionName: "generatePreview_createServerFn_handler",
-    importer: () => import("./leads.functions-niBcexzc.mjs")
+    importer: () => import("./leads.functions-Binv45Y5.mjs")
   },
   "add9d5062ae8cd43029d764a92782b75295a21c733b36bb694a65ac2178298a6": {
     functionName: "upsertTile_createServerFn_handler",
-    importer: () => import("./admin.functions-BfVLr8RV.mjs")
+    importer: () => import("./admin.functions-Q8Ozl9gU.mjs")
   },
   "c4914de15b69e3708912558dce7c6fc2ff9cfdd664f29082dbfdb3552465b36d": {
     functionName: "deleteLead_createServerFn_handler",
-    importer: () => import("./admin.functions-BfVLr8RV.mjs")
+    importer: () => import("./admin.functions-Q8Ozl9gU.mjs")
   },
   "c66fe9cfec2a6c1bf0783033c642d937fa04e2774b783918c1cb9e08b54f7d52": {
     functionName: "updateContactStatus_createServerFn_handler",
-    importer: () => import("./contact.functions-DiiqUXA9.mjs")
+    importer: () => import("./contact.functions-B4YTt0TD.mjs")
   },
   "d09b5def561c97d9af2d33d19dea3fb9e628ab88e1cbc611eb88b776cde547d4": {
     functionName: "createLead_createServerFn_handler",
-    importer: () => import("./leads.functions-niBcexzc.mjs")
+    importer: () => import("./leads.functions-Binv45Y5.mjs")
   },
   "f11efb53847f1d9abeab1aa16c43ecf00b29d672ea2f512ea9e6a86a576c3782": {
     functionName: "getLeadResult_createServerFn_handler",
-    importer: () => import("./leads.functions-niBcexzc.mjs")
+    importer: () => import("./leads.functions-Binv45Y5.mjs")
   }
 };
 async function getServerFnById(id, access) {
@@ -1384,8 +1387,8 @@ var getBaseManifest = getProdBaseManifest;
 var createEarlyHintsForRequest = createEarlyHintsCollector;
 async function loadEntries() {
   const [routerEntry, startEntry, pluginAdapters] = await Promise.all([
-    import("./router-BLEruhWc.mjs"),
-    import("./start-DuCHF4TB.mjs"),
+    import("./router-jiT1pPML.mjs"),
+    import("./start-N-KmZWXo.mjs"),
     import("./empty-plugin-adapters-BFgPZ6_d.mjs")
   ]);
   return {

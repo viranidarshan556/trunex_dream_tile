@@ -1,5 +1,5 @@
-import { c as createSsrRpc } from "./createSsrRpc-DYlhEagM.mjs";
-import { a as createServerFn } from "./server-BV-6dHeb.mjs";
+import { c as createSsrRpc } from "./createSsrRpc-CVgcWAa8.mjs";
+import { a as createServerFn } from "./server-Czlvuct_.mjs";
 import { o as objectType, s as stringType, e as enumType, n as numberType } from "../_libs/zod.mjs";
 const inputSchema = objectType({
   full_name: stringType().min(2).max(100),

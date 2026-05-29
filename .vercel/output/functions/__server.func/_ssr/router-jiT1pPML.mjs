@@ -122,7 +122,7 @@ function RootComponent() {
     /* @__PURE__ */ jsxRuntimeExports.jsx(Toaster, { richColors: true, position: "top-center" })
   ] });
 }
-const $$splitComponentImporter$9 = () => import("./self-design-BgDYVtz5.mjs");
+const $$splitComponentImporter$9 = () => import("./self-design-Ddv72GKk.mjs");
 const Route$9 = createFileRoute("/self-design")({
   head: () => ({
     meta: [{
@@ -143,7 +143,7 @@ const Route$8 = createFileRoute("/login")({
   }),
   component: lazyRouteComponent($$splitComponentImporter$8, "component")
 });
-const $$splitComponentImporter$7 = () => import("./expert-design-2GrtsYeo.mjs");
+const $$splitComponentImporter$7 = () => import("./expert-design-8NPAUhmb.mjs");
 const Route$7 = createFileRoute("/expert-design")({
   head: () => ({
     meta: [{
@@ -155,7 +155,7 @@ const Route$7 = createFileRoute("/expert-design")({
   }),
   component: lazyRouteComponent($$splitComponentImporter$7, "component")
 });
-const $$splitComponentImporter$6 = () => import("./index-DGh637Ad.mjs");
+const $$splitComponentImporter$6 = () => import("./index-B__rCetT.mjs");
 const Route$6 = createFileRoute("/")({
   head: () => ({
     meta: [{
@@ -173,7 +173,7 @@ const Route$6 = createFileRoute("/")({
   }),
   component: lazyRouteComponent($$splitComponentImporter$6, "component")
 });
-const $$splitComponentImporter$5 = () => import("./result._id-DCgPi--_.mjs");
+const $$splitComponentImporter$5 = () => import("./result._id-BRuCnlmH.mjs");
 const Route$5 = createFileRoute("/result/$id")({
   head: () => ({
     meta: [{
@@ -189,19 +189,19 @@ const $$splitComponentImporter$4 = () => import("../_authenticated.admin-DJKwMqV
 const Route$4 = createFileRoute("/_authenticated/admin")({
   component: lazyRouteComponent($$splitComponentImporter$4, "component")
 });
-const $$splitComponentImporter$3 = () => import("../_authenticated.admin.index-c5yi7WsM.mjs");
+const $$splitComponentImporter$3 = () => import("../_authenticated.admin.index-DQXqKvHx.mjs");
 const Route$3 = createFileRoute("/_authenticated/admin/")({
   component: lazyRouteComponent($$splitComponentImporter$3, "component")
 });
-const $$splitComponentImporter$2 = () => import("../_authenticated.admin.tiles-s9GuJ4WM.mjs");
+const $$splitComponentImporter$2 = () => import("../_authenticated.admin.tiles-77xcwE2l.mjs");
 const Route$2 = createFileRoute("/_authenticated/admin/tiles")({
   component: lazyRouteComponent($$splitComponentImporter$2, "component")
 });
-const $$splitComponentImporter$1 = () => import("../_authenticated.admin.leads-BoOlSqEK.mjs");
+const $$splitComponentImporter$1 = () => import("../_authenticated.admin.leads-C3YRUFfA.mjs");
 const Route$1 = createFileRoute("/_authenticated/admin/leads")({
   component: lazyRouteComponent($$splitComponentImporter$1, "component")
 });
-const $$splitComponentImporter = () => import("../_authenticated.admin.contacts-D24YXHVa.mjs");
+const $$splitComponentImporter = () => import("../_authenticated.admin.contacts-CPm6-Stw.mjs");
 const Route = createFileRoute("/_authenticated/admin/contacts")({
   component: lazyRouteComponent($$splitComponentImporter, "component")
 });

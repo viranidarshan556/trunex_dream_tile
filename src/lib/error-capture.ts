@@ -4,9 +4,11 @@
 let lastCapturedError: { error: unknown; at: number } | undefined;
 const TTL_MS = 5_000;
 
-function record(error: unknown) {
+export function record(error: unknown) {
   lastCapturedError = { error, at: Date.now() };
 }
+
+(globalThis as any).__LOVABLE_TANSTACK_CAPTURE_SSR_ERROR__ = record;
 
 if (typeof globalThis.addEventListener === "function") {
   globalThis.addEventListener("error", (event) => record((event as ErrorEvent).error ?? event));
