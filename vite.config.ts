@@ -36,6 +36,7 @@ export default defineConfig({
       serverDir: ".vercel/output/functions/__server.func",
       publicDir: ".vercel/output/static",
     },
+    noExternals: ["tslib"],
   },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
