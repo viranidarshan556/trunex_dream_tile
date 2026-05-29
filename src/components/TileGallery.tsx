@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { DEFAULT_TILES } from "@/lib/default-tiles";
 
 export interface Tile {
   id: string;
@@ -20,8 +21,7 @@ interface Props {
 }
 
 export function TileGallery({ selectedId, onSelect }: Props) {
-  const [tiles, setTiles] = useState<Tile[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [tiles, setTiles] = useState<Tile[]>(DEFAULT_TILES);
 
   useEffect(() => {
     supabase
@@ -30,12 +30,11 @@ export function TileGallery({ selectedId, onSelect }: Props) {
       .eq("active", true)
       .order("created_at", { ascending: false })
       .then(({ data }) => {
-        setTiles((data as Tile[]) || []);
-        setLoading(false);
+        const dbTiles = (data as Tile[]) || [];
+        setTiles([...dbTiles, ...DEFAULT_TILES]);
       });
   }, []);
 
-  if (loading) return <p className="text-sm text-muted-foreground">Loading tiles…</p>;
   if (tiles.length === 0) return <p className="text-sm text-muted-foreground">No tiles available yet.</p>;
 
   return (
@@ -51,7 +50,7 @@ export function TileGallery({ selectedId, onSelect }: Props) {
           )}
         >
           <div className="aspect-square overflow-hidden bg-muted">
-            <img src={t.image_url} alt={t.name} className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+            <img src={t.image_url} alt={t.name} loading="lazy" className="h-full w-full object-cover transition-transform group-hover:scale-105" />
           </div>
           <div className="p-2">
             <p className="truncate text-xs font-semibold">{t.name}</p>
