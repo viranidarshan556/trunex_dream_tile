@@ -18,7 +18,6 @@ export function SiteHeader() {
           <a href="#gallery" className="text-muted-foreground hover:text-primary">Gallery</a>
           <a href="#reviews" className="hidden text-muted-foreground hover:text-primary sm:inline">Reviews</a>
           <a href="#contact" className="text-muted-foreground hover:text-primary">Contact</a>
-          <Link to="/login" className="uppercase tracking-widest text-muted-foreground hover:text-primary">Admin</Link>
         </nav>
       </div>
     </header>

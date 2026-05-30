@@ -1,4 +1,4 @@
-import { BRAND, TRUNEX_LOGO, TRUNEX_WHATSAPP } from "@/lib/constants";
+import { BRAND, TRUNEX_LOGO, TRUNEX_PHONE_DISPLAY, TRUNEX_WHATSAPP } from "@/lib/constants";
 
 export function SiteFooter() {
   return (
@@ -34,7 +34,7 @@ export function SiteFooter() {
         <div>
           <p className="text-xs uppercase tracking-widest text-primary font-semibold">Reach Us</p>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            <li>WhatsApp: <a href={`https://wa.me/${TRUNEX_WHATSAPP}`} className="text-primary hover:underline">+91 87988 21619</a></li>
+            <li>WhatsApp: <a href={`https://wa.me/${TRUNEX_WHATSAPP}`} className="text-primary hover:underline">{TRUNEX_PHONE_DISPLAY}</a></li>
             <li>Email: <a href={`mailto:${BRAND.notifyEmail}`} className="text-primary hover:underline">{BRAND.notifyEmail}</a></li>
             <li>Coverage: {BRAND.city}</li>
           </ul>
