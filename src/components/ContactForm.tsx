@@ -20,7 +20,20 @@ export function ContactForm() {
       toast.success("Thank you! We'll get back to you shortly.");
       setForm({ full_name: "", contact_number: "", email: "", message: "" });
     } catch (err: any) {
-      toast.error(err?.message || "Failed to send. Please try again.");
+      let errorMessage = "Failed to send. Please try again.";
+      if (err?.message) {
+        try {
+          const parsed = JSON.parse(err.message);
+          if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].message) {
+            errorMessage = parsed[0].message;
+          } else {
+            errorMessage = err.message;
+          }
+        } catch {
+          errorMessage = err.message;
+        }
+      }
+      toast.error(errorMessage);
     } finally {
       setBusy(false);
     }

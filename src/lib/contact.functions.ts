@@ -4,10 +4,10 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const contactSchema = z.object({
-  full_name: z.string().min(2).max(120),
-  contact_number: z.string().regex(/^[6-9]\d{9}$/, "Enter a valid 10-digit Indian mobile"),
-  email: z.string().email().optional().or(z.literal("")),
-  message: z.string().min(5).max(2000),
+  full_name: z.string().min(2, "Name must be at least 2 characters").max(120),
+  contact_number: z.string().regex(/^\d{10}$/, "Enter a valid 10-digit mobile number"),
+  email: z.string().email("Enter a valid email address").optional().or(z.literal("")),
+  message: z.string().min(1, "Message cannot be empty").max(2000),
 });
 
 export const submitContact = createServerFn({ method: "POST" })
