@@ -92,59 +92,67 @@ export const generatePreview = createServerFn({ method: "POST" })
       tileFinish = tile.finish;
     }
 
+    let generatedPrompt = `A stunning, high-end photorealistic interior design photo of a gorgeous room, where the entire floor is perfectly and elegantly tiled with tiles named '${tileName}' (size ${tileSize}, featuring a high-quality ${tileFinish} finish). The perspective shows the tiles extending naturally across the floor, with elegant professional studio lighting, casting realistic soft shadows from furniture, 8k resolution, photorealistic, architectural digest style.`;
+
     const apiKey = process.env.GEMINI_KEY || process.env.GEMINI_API_KEY;
-    if (!apiKey) throw new Error("GEMINI_KEY or GEMINI_API_KEY missing");
+    
+    if (apiKey) {
+      try {
+        // Fetch both room and tile images to send to Gemini Flash
+        const [roomDataUrl, tileDataUrl] = await Promise.all([
+          fetchImageAsDataUrl(data.room_image_url),
+          fetchImageAsDataUrl(tileImageUrl),
+        ]);
 
-    // Fetch both room and tile images to send to Gemini Flash
-    const [roomDataUrl, tileDataUrl] = await Promise.all([
-      fetchImageAsDataUrl(data.room_image_url),
-      fetchImageAsDataUrl(tileImageUrl),
-    ]);
+        const roomB64 = getBase64Data(roomDataUrl);
+        const tileB64 = getBase64Data(tileDataUrl);
 
-    const roomB64 = getBase64Data(roomDataUrl);
-    const tileB64 = getBase64Data(tileDataUrl);
-
-    // Call Gemini 2.0 Flash (100% Free Tier) to analyze images and write the perfect generation prompt
-    const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
+        // Call Gemini 2.0 Flash (100% Free Tier) to analyze images and write the perfect generation prompt
+        const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contents: [
               {
-                text: `You are an expert interior visualizer. Analyze the first image (room photo) and the second image (tile texture named "${tileName}", size ${tileSize}, finish ${tileFinish}).
-                Write a highly detailed, professional, single-paragraph prompt for a text-to-image generator. The prompt must describe a photorealistic interior design render of a room with the exact same layout, furniture, and style as the first image, but with the floor beautifully and perfectly covered with the new tile texture.
-                Do not include any greeting or conversational text. Output ONLY the optimized prompt, starting directly with "A photorealistic interior design photo..." and ending with "...highly detailed, 8k resolution, photorealistic."`
-              },
-              {
-                inlineData: {
-                  mimeType: roomB64.mimeType,
-                  data: roomB64.data,
-                }
-              },
-              {
-                inlineData: {
-                  mimeType: tileB64.mimeType,
-                  data: tileB64.data,
-                }
+                parts: [
+                  {
+                    text: `You are an expert interior visualizer. Analyze the first image (room photo) and the second image (tile texture named "${tileName}", size ${tileSize}, finish ${tileFinish}).
+                    Write a highly detailed, professional, single-paragraph prompt for a text-to-image generator. The prompt must describe a photorealistic interior design render of a room with the exact same layout, furniture, and style as the first image, but with the floor beautifully and perfectly covered with the new tile texture.
+                    Do not include any greeting or conversational text. Output ONLY the optimized prompt, starting directly with "A photorealistic interior design photo..." and ending with "...highly detailed, 8k resolution, photorealistic."`
+                  },
+                  {
+                    inlineData: {
+                      mimeType: roomB64.mimeType,
+                      data: roomB64.data,
+                    }
+                  },
+                  {
+                    inlineData: {
+                      mimeType: tileB64.mimeType,
+                      data: tileB64.data,
+                    }
+                  }
+                ]
               }
             ]
+          }),
+        });
+
+        if (geminiRes.ok) {
+          const geminiJson: any = await geminiRes.json();
+          const text = geminiJson?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+          if (text) {
+            generatedPrompt = text;
           }
-        ]
-      }),
-    });
-
-    if (!geminiRes.ok) {
-      const errorText = await geminiRes.text();
-      throw new Error(`Gemini API error ${geminiRes.status}: ${errorText.slice(0, 200)}`);
+        } else {
+          console.warn(`Gemini API returned error status ${geminiRes.status}, falling back to static prompt template.`);
+        }
+      } catch (err) {
+        console.error("Gemini API failed, falling back to static prompt template:", err);
+      }
     }
-
-    const geminiJson: any = await geminiRes.json();
-    const generatedPrompt = geminiJson?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || 
-      `A modern photorealistic interior design photo of a gorgeous room with the floor perfectly tiled with tiles named '${tileName}' (size ${tileSize}, ${tileFinish} finish).`;
 
     // Call Pollinations.ai (100% Free Public AI Image Generator) to render the preview room!
     const encodedPrompt = encodeURIComponent(generatedPrompt);
