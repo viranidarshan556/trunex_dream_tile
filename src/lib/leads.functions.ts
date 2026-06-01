@@ -86,7 +86,9 @@ export const generatePreview = createServerFn({ method: "POST" })
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        prompt: promptText,
+        prompt: {
+          text: promptText,
+        },
         numberOfImages: 1,
         outputMimeType: "image/jpeg",
         aspectRatio: "1:1",
