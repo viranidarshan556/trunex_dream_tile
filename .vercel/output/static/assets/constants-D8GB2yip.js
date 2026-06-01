@@ -1,1 +1,0 @@
-const t="/assets/trunex-logo-Cqvrahtl.jpeg",a="918798821619",o=t,n={name:"TRUNEX",tagline:"Trusted by Next Generation",group:"TRUNEX GROUP",city:"Pan India",notifyEmail:"buckatiexport@gmail.com"};export{n as B,o as T,a};
