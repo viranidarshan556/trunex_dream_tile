@@ -52,21 +52,11 @@ const previewSchema = z
     message: "Either tile_id or tile_image_url is required",
   });
 
-async function fetchImageAsDataUrl(url: string): Promise<string> {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Failed to fetch image: ${url}`);
-  const buf = await res.arrayBuffer();
-  const mime = res.headers.get("content-type") || "image/jpeg";
-  const b64 = Buffer.from(buf).toString("base64");
-  return `data:${mime};base64,${b64}`;
-}
-
 export const generatePreview = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => previewSchema.parse(d))
   .handler(async ({ data }) => {
     const sb = admin();
 
-    let tileImageUrl: string;
     let tileName = data.tile_name || "selected tile";
     let tileSize = data.tile_size || "600x600";
     let tileFinish = data.tile_finish || "matte";
@@ -80,90 +70,47 @@ export const generatePreview = createServerFn({ method: "POST" })
         .single();
       if (tErr || !tile) throw new Error("Tile not found");
       dbTile = tile;
-      tileImageUrl = tile.image_url;
       tileName = tile.name;
       tileSize = tile.size;
       tileFinish = tile.finish;
-    } else {
-      tileImageUrl = data.tile_image_url!;
     }
 
-    const [roomDataUrl, tileDataUrl] = await Promise.all([
-      fetchImageAsDataUrl(data.room_image_url),
-      fetchImageAsDataUrl(tileImageUrl),
-    ]);
+    const apiKey = process.env.GEMINI_KEY || process.env.GEMINI_API_KEY;
+    if (!apiKey) throw new Error("GEMINI_KEY or GEMINI_API_KEY missing");
 
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
+    const promptText = `A modern photorealistic interior design photo of a gorgeous room (like a kitchen, living room, or bathroom), where the entire floor is perfectly and elegantly tiled with tiles named '${tileName}' (size ${tileSize}, ${tileFinish} finish). The lighting should be professional, casting soft realistic shadows, showing off the texture and quality of the tiles in perspective.`;
 
-    const prompt = `You are an expert interior visualizer. The FIRST image is a real photo of a customer's room. The SECOND image is a single tile texture (${tileName}, size ${tileSize}, ${tileFinish} finish).
-
-YOUR TASK: Re-render the same room with this tile applied to the appropriate surface(s). Auto-detect the surface based on the photo:
-- If the photo is a normal room / living room / bedroom / kitchen / office — tile the FLOOR only.
-- If the photo is a bathroom or shower area — tile BOTH the floor AND the wet-area walls (where wall tiles typically go).
-- If the photo clearly shows only a wall (close-up of wall, backsplash, feature wall) — tile that WALL.
-- If both floor and walls are clearly visible in a bathroom-like setting — tile both.
-
-CRITICAL RULES:
-1. Preserve the room's perspective, camera angle, lighting direction, shadows, furniture, fixtures, doors, windows, ceiling and any objects exactly as in the original photo. Do not move or alter them.
-2. Tile the chosen surface(s) with realistic grout lines, correct scale for tile size ${tileSize}, and surface reflectivity matching a ${tileFinish} finish.
-3. Follow the original surface's perspective so tiles converge naturally toward vanishing points.
-4. Preserve the original shadows cast onto the surface by furniture and people.
-5. Output a single photorealistic image of the same room with the new tile applied. Do NOT add or remove furniture. Do NOT change wall color outside the tiled area.`;
-
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:generateImages?key=${apiKey}`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3.1-flash-image-preview",
-        modalities: ["image", "text"],
-        messages: [
-          {
-            role: "user",
-            content: [
-              { type: "text", text: prompt },
-              { type: "image_url", image_url: { url: roomDataUrl } },
-              { type: "image_url", image_url: { url: tileDataUrl } },
-            ],
-          },
-        ],
+        prompt: promptText,
+        numberOfImages: 1,
+        outputMimeType: "image/jpeg",
+        aspectRatio: "1:1",
       }),
     });
 
     if (!res.ok) {
-      const t = await res.text();
-      throw new Error(`AI gateway error ${res.status}: ${t.slice(0, 200)}`);
+      const errorText = await res.text();
+      throw new Error(`Gemini Imagen API error ${res.status}: ${errorText.slice(0, 200)}`);
     }
-    const json: any = await res.json();
-    const msg = json?.choices?.[0]?.message;
-    const imgUrl: string | undefined =
-      msg?.images?.[0]?.image_url?.url ||
-      msg?.images?.[0]?.url ||
-      (Array.isArray(msg?.content)
-        ? msg.content.find((c: any) => c.type === "image_url")?.image_url?.url
-        : undefined);
-    if (!imgUrl) throw new Error("No image returned from AI");
 
-    const m = imgUrl.match(/^data:(.+?);base64,(.+)$/);
-    let buffer: Buffer;
-    let contentType = "image/png";
-    if (m) {
-      contentType = m[1];
-      buffer = Buffer.from(m[2], "base64");
-    } else {
-      const r = await fetch(imgUrl);
-      buffer = Buffer.from(await r.arrayBuffer());
-      contentType = r.headers.get("content-type") || "image/png";
-    }
-    const ext = contentType.split("/")[1] || "png";
-    const path = `${data.lead_id}-${Date.now()}.${ext}`;
+    const json: any = await res.json();
+    const b64 = json?.generatedImages?.[0]?.image?.imageBytes;
+    if (!b64) throw new Error("No image returned from Gemini Imagen API");
+
+    const buffer = Buffer.from(b64, "base64");
+    const contentType = "image/jpeg";
+    const path = `${data.lead_id}-${Date.now()}.jpg`;
+
     const { error: upErr } = await sb.storage
       .from("generated-previews")
       .upload(path, buffer, { contentType, upsert: true });
     if (upErr) throw new Error(upErr.message);
+
     const publicUrl = sb.storage.from("generated-previews").getPublicUrl(path).data.publicUrl;
 
     const update: any = { generated_image_url: publicUrl };
