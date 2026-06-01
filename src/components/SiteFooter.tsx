@@ -13,7 +13,7 @@ export function SiteFooter() {
             </div>
           </div>
           <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
-            For the last <span className="font-semibold text-primary">12+ years</span>, TRUNEX Group has been a trusted
+            For the last <span className="font-semibold text-primary">35+ years</span>, TRUNEX Group has been a trusted
             expert in building materials across India. We are the <span className="font-semibold text-primary">fastest growing brand</span> in
             doors and tiles — serving thousands of homes, builders and architects pan-India with premium quality,
             modern designs and unmatched service.

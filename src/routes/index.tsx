@@ -11,7 +11,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "TRUNEX Group — Tiles, Doors & AI Tile Visualizer" },
-      { name: "description", content: "TRUNEX Group — Pan-India leader in tiles and doors for 12+ years. Try our AI tile visualizer to preview TRUNEX tiles in your own room instantly." },
+      { name: "description", content: "TRUNEX Group — Pan-India leader in tiles and doors for 35+ years. Try our AI tile visualizer to preview TRUNEX tiles in your own room instantly." },
       { property: "og:title", content: "TRUNEX Group — Trusted by Next Generation" },
       { property: "og:description", content: "Preview TRUNEX tiles in your own room with AI. India's fastest growing tiles & doors brand." },
     ],
